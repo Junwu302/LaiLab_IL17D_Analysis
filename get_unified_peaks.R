@@ -1,4 +1,4 @@
-hg38_blacklist = rtracklayer::import.bed('/mnt/data/WuJun/RefDatabase/Bowtie2_Index/GRCh38_unified_blacklist.bed')
+hg38_blacklist = rtracklayer::import.bed('~/RefDatabase/Bowtie2_Index/GRCh38_unified_blacklist.bed')
 ## 1. ATAC
 atac_path = '~/ATAC_SEQ/IL17D_ATACSeq_KCs/Cleandata'
 peak_fls = list.files(atac_path, pattern = 'ATAC_.*_peaks.narrowPeak$', full.names = T)
