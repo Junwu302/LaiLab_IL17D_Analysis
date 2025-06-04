@@ -1,9 +1,9 @@
 #!usr/bin/bash
 chip_path=~ChIP_SEQ/IL17D_ChIP_SEQ_KCs/Cleandata
 Con_la_bam1=${chip_path}/con-la-1/con-la-1.rmdup.bam
-Con_la_bam2=${chip_path}/con-la-3/con-la-1.rmdup.bam
+Con_la_bam2=${chip_path}/con-la-2/con-la-2.rmdup.bam
 IL17D_la_bam1=${chip_path}/IL17D-la-1/IL17D-la-1.rmdup.bam
-IL17D_la_bam2=${chip_path}/IL17D-la-3/IL17D-la-1.rmdup.bam
+IL17D_la_bam2=${chip_path}/IL17D-la-2/IL17D-la-2.rmdup.bam
 
 Con_me_bam1=${chip_path}/con-me-1/con-me-1.rmdup.bam
 Con_me_bam2=${chip_path}/con-me-2/con-me-2.rmdup.bam
