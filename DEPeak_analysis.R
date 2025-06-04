@@ -24,6 +24,39 @@ de_peaks = function(Counts, Group){
   return(list(DPeaks = DPeaks, CPM = CPM, peakAnno = peakAnno))
 }
 
+enrich_func = function(genelist){
+  require(clusterProfiler, quietly = T)
+  require(org.Hs.eg.db, quietly = T)
+  kegg_res = setReadable(enrichKEGG(gene = genelist, organism = 'hsa', pAdjustMethod = 'none', pvalueCutoff = 1),
+                         OrgDb = 'org.Hs.eg.db',keyType ='ENTREZID')@result
+  kegg_res$qvalue = p.adjust(kegg_res$pvalue, method = 'BH')
+  go_res = enrichGO(gene = genelist, OrgDb = 'org.Hs.eg.db', keyType = 'ENTREZID', ont = 'ALL', pAdjustMethod = 'none',
+                    pvalueCutoff = 1,qvalueCutoff=1, readable = TRUE)@result
+  go_res$qvalue = p.adjust(go_res$pvalue, method = 'BH')
+  return(list(GO=go_res, KEGG = kegg_res))
+}
+
 H3K4me1_DEPeaks = de_peaks(Counts = H3K4me1_Counts, Group = factor(rep(c('Con','IL17D'),each = 2), levels = c('Con','IL17D')))
 H3K18la_DEPeaks = de_peaks(Counts = H3K18la_Counts, Group = factor(rep(c('Con','IL17D'),each = 2), levels = c('Con','IL17D')))
 ATAC_DEPeaks = de_peaks(Counts = ATAC_Counts, Group = factor(rep(c('Con','IL17D'),each = 2), levels = c('Con','IL17D')))
+
+# H3K18la
+H3K18la_anno = merge(H3K18la_DEPeaks$DPeaks[,c('chr','start','end','logFC','PValue')], 
+                     H3K18la_DEPeaks$peakAnno[!is.na(H3K18la_DEPeaks$peakAnno$SYMBOL),c('seqnames','start','end','annotation','SYMBOL','geneId')],
+                     by.x = c('chr','start','end'), by.y = c('seqnames','start','end'))
+genelist = unique(H3K18la_anno$geneId[grepl('Promoter', H3K18la_anno$annotation) & H3K18la_anno$PValue < 0.05])
+H3K18la_enrichment = enrich_func(genelist = genelist)
+
+# H3K4me1
+H3K4me1_anno = merge(H3K4me1_DEPeaks$DPeaks[,c('chr','start','end','logFC','PValue')], 
+                     H3K4me1_DEPeaks$peakAnno[!is.na(H3K4me1_DEPeaks$peakAnno$SYMBOL),c('seqnames','start','end','annotation','SYMBOL','geneId')],
+                     by.x = c('chr','start','end'), by.y = c('seqnames','start','end'))
+genelist = unique(H3K4me1_anno$geneId[grepl('Promoter', H3K4me1_anno$annotation) & H3K4me1_anno$PValue < 0.05])
+H3K4me1_enrichment = enrich_func(genelist = genelist)
+
+# ATAC-seq
+ATAC_anno = merge(ATAC_DEPeaks$DPeaks[,c('chr','start','end','logFC','PValue')], 
+                  ATAC_DEPeaks$peakAnno[!is.na(ATAC_DEPeaks$peakAnno$SYMBOL),c('seqnames','start','end','annotation','SYMBOL','geneId')],
+                     by.x = c('chr','start','end'), by.y = c('seqnames','start','end'))
+genelist = unique(ATAC_anno$geneId[grepl('Promoter', ATAC_anno$annotation) & ATAC_anno$PValue < 0.05])
+ATAC_enrichment = enrich_func(genelist = genelist)
